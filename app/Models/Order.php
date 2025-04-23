@@ -3,31 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    public static function boot()
-    {
-        parent::boot();
+    use SoftDeletes;
 
-        static::saving(function ($order) {
-            $order->total_price = $order->quantity * $order->product->price;
-        });
-    }
     protected $fillable = [
         'user_id',
         'product_id',
         'quantity',
-        'name',
-        'email',
+        'user_name',
+        'user_email',
+        'total'
     ];
 
-    public function user()
+    public function user() : BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function product()
+    public function product() : BelongsTo
     {
         return $this->belongsTo(Product::class);
     }

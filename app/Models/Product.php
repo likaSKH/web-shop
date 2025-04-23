@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -16,12 +18,12 @@ class Product extends Model
         'description',
     ];
 
-    public function categories()
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
     }
 
-    public function orders()
+    public function orders() : HasMany
     {
         return $this->hasMany(Order::class);
     }
@@ -29,16 +31,6 @@ class Product extends Model
     public function scopeAvailable($query)
     {
         return $query->where('quantity', '>', 0);
-    }
-
-    public function decreaseStock($quantity)
-    {
-        if ($this->quantity >= $quantity) {
-            $this->quantity -= $quantity;
-            $this->save();
-        } else {
-            throw new \Exception('Not enough stock');
-        }
     }
 
 }
