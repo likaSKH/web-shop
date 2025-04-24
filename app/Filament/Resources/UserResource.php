@@ -15,11 +15,9 @@ use Filament\Tables\Table;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\SelectFilter;
 
-
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -76,5 +74,4 @@ class UserResource extends Resource
     {
         return 'Customers';
     }
-
 }

@@ -1,7 +1,6 @@
 <?php
 
+use App\Livewire\Shop\Products;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/products', Products::class)->name('products');
