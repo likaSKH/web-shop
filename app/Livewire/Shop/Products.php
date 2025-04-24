@@ -2,24 +2,23 @@
 
 namespace App\Livewire\Shop;
 
+use App\Models\Product;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Products extends Component
 {
-    public $products;
+    use WithPagination;
 
-    public function mount()
-    {
-        $this->products = \App\Models\Product::all();
-    }
+    public $perPage = 10;  // Number of products per page
 
-    public function order($productId)
-    {
-        // Optional: redirect to order form or show a modal
-    }
-
+    // Load products with pagination
     public function render()
     {
-        return view('livewire.shop.products')->layout('layouts.app'); ;
+        $products = Product::paginate($this->perPage);  // Paginate the products
+
+        return view('livewire.shop.products', [
+            'products' => $products,  // Pass paginated products to the view
+        ]);
     }
 }
