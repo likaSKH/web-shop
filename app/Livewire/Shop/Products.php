@@ -10,15 +10,19 @@ class Products extends Component
 {
     use WithPagination;
 
-    public $perPage = 10;  // Number of products per page
+    public $perPage = 12;
+    public $query = '';
 
-    // Load products with pagination
     public function render()
     {
-        $products = Product::paginate($this->perPage);  // Paginate the products
+        $products = Product::query()
+            ->when($this->query, function ($query) {
+                $query->where('name', 'like', '%' . $this->query . '%');
+            })
+            ->paginate($this->perPage);
 
         return view('livewire.shop.products', [
-            'products' => $products,  // Pass paginated products to the view
-        ]);
+            'products' => $products,
+        ])->layout('layouts.app');
     }
 }

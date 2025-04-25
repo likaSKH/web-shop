@@ -4,23 +4,19 @@
     <meta charset="UTF-8">
     <title>Webshop</title>
 
-    {{-- Vite for Laravel --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- Livewire Styles --}}
     @livewireStyles
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen">
 
 <header class="bg-white shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <!-- Logo -->
         <a href="/" class="text-xl font-semibold text-gray-800 hover:text-teal-800 flex items-center space-x-2">
             <x-carbon-shopping-cart class="w-6 h-6 text-teal-800" />
             <span>MyShop</span>
         </a>
 
-        <!-- Navigation -->
         <nav class="space-x-4">
             <a href="{{ route('products') }}" class="text-gray-700 hover:text-teal-800">Products</a>
 
@@ -41,10 +37,13 @@
 </header>
 
 <main class="py-6 flex justify-center items-center min-h-[calc(100vh-4rem)] px-4">
-    {{ $slot }}
+    <div class="grid grid-cols-12 w-full max-w-screen-xl">
+        <div class="col-span-12 md:col-start-3 md:col-span-8">
+            {{ $slot }}
+        </div>
+    </div>
 </main>
 
-{{-- Livewire Scripts --}}
 @livewireScripts
 
 </body>
