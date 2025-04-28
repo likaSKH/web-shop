@@ -1,4 +1,4 @@
-<div class="min-h-screen flex flex-col p-6 space-y-6">
+<div class="min-h-screen flex flex-col p-6 space-y-6 w-full max-w-5xl mx-auto">
     <div class="w-full flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div x-data="{ open: false, categoriesLoaded: false }" class="relative">
             <button @click="
@@ -24,13 +24,13 @@
                 wire:key="query"
                 wire:model.live="query"
                 placeholder="Search products..."
-                class="p-4 w-full border-gray-300 focus:border-teal-500 focus:ring focus:ring-teal-200 rounded-md shadow-sm"
+                class="p-4 w-full border-gray-300 focus:ring focus:ring-gray-200 rounded-md shadow-sm"
             />
         </div>
 
         <select
             wire:change="setOrder($event.target.value)"
-            class="p-2 border-gray-300 focus:border-teal-500 focus:ring focus:ring-teal-200 rounded-md shadow-sm"
+            class="p-4 pr-8 border-gray-300 focus:ring focus:ring-gray-200 rounded-md shadow-sm"
         >
             <option value="name-asc">Name ↑</option>
             <option value="name-desc">Name ↓</option>
