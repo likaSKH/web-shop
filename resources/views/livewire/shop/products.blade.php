@@ -27,6 +27,16 @@
                 class="p-4 w-full border-gray-300 focus:border-teal-500 focus:ring focus:ring-teal-200 rounded-md shadow-sm"
             />
         </div>
+
+        <select
+            wire:change="setOrder($event.target.value)"
+            class="p-2 border-gray-300 focus:border-teal-500 focus:ring focus:ring-teal-200 rounded-md shadow-sm"
+        >
+            <option value="name-asc">Name ↑</option>
+            <option value="name-desc">Name ↓</option>
+            <option value="price-asc">Price ↑</option>
+            <option value="price-desc">Price ↓</option>
+        </select>
     </div>
 
     <div class="flex-grow">
