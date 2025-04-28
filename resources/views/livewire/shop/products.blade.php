@@ -13,7 +13,7 @@
             <div x-show="open" x-transition @click.away="open = false"
                  class="absolute mt-2 w-56 bg-white shadow-lg rounded-md z-50 p-4 space-y-2">
                 <div x-show="categoriesLoaded">
-                    @livewire('categories.categories')
+                    <livewire:categories.categories/>
                 </div>
             </div>
         </div>

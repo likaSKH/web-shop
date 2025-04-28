@@ -9,15 +9,18 @@ class Categories extends Component
 {
     public $categories;
     public $expanded = [];
+    public $selectedCategory;
+    protected $listeners = [ 'category-updated' => 'updatedSelectedCategory' ];
 
-    public function mount()
+    public function mount($selectedCategory = null)
     {
+        $this->selectedCategory = $selectedCategory;
         $this->loadCategories();
     }
 
-    public function updatedSearchQuery()
+    public function updatedSelectedCategory($value)
     {
-        $this->loadCategories();
+        $this->selectedCategory = $value;
     }
 
     protected function loadCategories()
@@ -29,6 +32,8 @@ class Categories extends Component
 
     public function render()
     {
-        return view('livewire.categories.categories');
+        return view('livewire.categories.categories', [
+            'selectedCategory' => $this->selectedCategory
+        ]);
     }
 }
