@@ -47,9 +47,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function canAccessFilament(): bool
+    public function isAdmin(): bool
     {
-        return $this->is_admin;
+        return $this->is_admin === 1;
     }
 
     public function orders()

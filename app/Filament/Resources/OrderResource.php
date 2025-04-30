@@ -23,6 +23,10 @@ class OrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function canCreate(array $parameters = []): bool
+    {
+        return auth()->user()->isAdmin();
+    }
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -97,27 +101,32 @@ class OrderResource extends Resource
                 TextColumn::make('created_at')->dateTime(),
             ])
             ->filters([
-                Filter::make('Archived')
+                Filter::make('Canceled')
                     ->query(fn (Builder $query) => $query->onlyTrashed())
-                    ->label('Archived Orders'),
+                    ->label('Canceled Orders'),
                 SelectFilter::make('Customer')
                     ->relationship('user', 'name')
                     ->label('Customer'),
             ])
             ->actions([
-                EditAction::make(),
-                Action::make('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
+                EditAction::make()
+                    ->visible(fn ($record) => $record->trashed() && auth()->user()->isAdmin()),
+
+                Action::make('cancel')
+                    ->label('Cancel')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
                     ->requiresConfirmation()
                     ->visible(fn ($record) => !$record->trashed())
-                    ->action(fn ($record) => $record->delete()),
-                Action::make('restore')
-                    ->label('Restore')
-                    ->icon('heroicon-o-arrow-uturn-left')
-                    ->color('success')
-                    ->visible(fn ($record) => $record->trashed())
-                    ->action(fn ($record) => $record->restore()),
+                    ->action(function (Order $record) {
+                        // Increase product stock
+                        $product = Product::find($record->product_id);
+                        if ($product) {
+                            $product->increment('quantity', $record->quantity);
+                        }
+
+                        $record->delete();
+                    }),
             ]);
     }
 
@@ -132,8 +141,16 @@ class OrderResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScopes([
+        $query = parent::getEloquentQuery()->withoutGlobalScopes([
             \Illuminate\Database\Eloquent\SoftDeletingScope::class,
         ]);
+
+        $user = auth()->user();
+
+        if (!$user->isAdmin()) {
+            $query->where('user_id', $user->id);
+        }
+
+        return $query;
     }
 }

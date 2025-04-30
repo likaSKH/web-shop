@@ -21,6 +21,17 @@ class ProductResource extends Resource
     protected static ?string $model = Product::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    /**
+     * Restrict access to this resource based on user role.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $record
+     * @return bool
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
     public static function form(Form $form): Form
     {
         return $form

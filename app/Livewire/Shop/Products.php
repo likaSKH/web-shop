@@ -3,6 +3,7 @@
 namespace App\Livewire\Shop;
 
 use App\Livewire\Categories\Categories;
+use App\Models\Order;
 use App\Models\Product;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -28,6 +29,7 @@ class Products extends Component
     {
         $this->resetPage();
     }
+
     public function categorySelected($categoryId)
     {
         $this->selectedCategory = $categoryId == $this->selectedCategory ? null : $categoryId;
@@ -37,9 +39,47 @@ class Products extends Component
 
     public function setOrder($value)
     {
-        \Log::info([$this->orderBy, $this->orderDirection] = explode('-', $value));
         [$this->orderBy, $this->orderDirection] = explode('-', $value);
         $this->resetPage();
+    }
+
+    public function placeOrder($productId, $quantity = 1)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $product = Product::findOrFail($productId);
+
+        if ($quantity < 1 || $quantity > $product->quantity) {
+            session()->flash('error', 'Product quantity is insufficient.');
+            return;
+        }
+
+        $total = $product->price * $quantity;
+
+        if ($total > auth()->user()->balance) {
+            session()->flash('error', 'Insufficient balance');
+            return;
+        }
+
+        $user = auth()->user();
+
+        Order::create([
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'user_email' => $user->email,
+            'product_id' => $productId,
+            'quantity' => $quantity,
+            'total' => $total,
+        ]);
+
+        $product->decrement('quantity', $quantity);
+
+        auth()->user()->decrement('balance', $total);
+
+        session()->flash('success', 'Order was created successfully.');
+        return redirect()->route('products');
     }
 
     public function render()
@@ -55,9 +95,9 @@ class Products extends Component
             })
             ->orderBy($this->orderBy, $this->orderDirection)
             ->paginate($this->perPage);
+        $user = auth()->user();
 
-        return view('livewire.shop.products', [
-            'products' => $products
-        ])->layout('layouts.app');
+        return view('livewire.shop.products', compact('products', 'user'))->layout('layouts.app');
     }
+
 }

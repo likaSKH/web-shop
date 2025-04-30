@@ -11,6 +11,11 @@ class EditOrder extends EditRecord
 {
     protected static string $resource = OrderResource::class;
 
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()->isAdmin();
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
