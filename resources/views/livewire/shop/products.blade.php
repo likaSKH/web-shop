@@ -25,9 +25,8 @@
     @endif
     <!-- Top Controls -->
     <div class="w-full flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-
         <!-- Category Button with Dropdown -->
-        <div x-data="{ categoryOpen: false, categoriesLoaded: false }" class="relative">
+        <div x-data="{ categoryOpen: false, categoriesLoaded: false }"  class="relative">
             <button @click="
                 categoryOpen = !categoryOpen;
                 if (categoryOpen && !categoriesLoaded) {
@@ -37,7 +36,7 @@
                 Categories
             </button>
 
-            <div x-show="categoryOpen" x-transition @click.outside="categoryOpen = false"
+            <div x-show="categoryOpen" x-transition @click.outside="categoryOpen = false" x-cloak
                  class="absolute mt-2 w-56 bg-white shadow-lg rounded-md z-50 p-4 space-y-2">
                 <div x-show="categoriesLoaded">
                     <livewire:categories.categories/>

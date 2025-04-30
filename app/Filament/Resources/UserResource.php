@@ -40,13 +40,8 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email'),
-                TextColumn::make('orders_count')
-                    ->label('Number of Orders'),
-            ])
-            ->filters([
-                SelectFilter::make('Orders')
-                    ->options(Order::all()->pluck('id', 'id')->toArray())
-                    ->label('Order Filter'),
+                TextColumn::make('balance')->money('usd')->label('Balance'),
+                TextColumn::make('orders_count')->label('Number of Orders'),
             ])
             ->actions([
                 Action::make('View Orders')
@@ -56,6 +51,22 @@ class UserResource extends Resource
                         'tableFilters[Customer][value]' => $record->id,
                     ]))
                     ->color('primary'),
+
+                Action::make('editBalance')
+                    ->label('Edit Balance')
+                    ->icon('heroicon-o-pencil')
+                    ->form(fn (User $record) => [
+                        TextInput::make('balance')
+                            ->numeric()
+                            ->label('New Balance')
+                            ->required()
+                            ->default($record->balance),
+                    ])
+                    ->action(function (array $data, User $record) {
+                        $record->update(['balance' => $data['balance']]);
+                    })
+                    ->modalHeading('Edit User Balance')
+                    ->color('warning'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

@@ -27,6 +27,9 @@ new class extends Component
                         <x-nav-link :href="route('profile')" :active="request()->routeIs('profile')" wire:navigate>
                             {{ __('Profile') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('filament.admin.resources.orders.index')" target="_blank">
+                            {{ __('Orders') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
