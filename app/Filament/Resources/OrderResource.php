@@ -119,7 +119,6 @@ class OrderResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn ($record) => !$record->trashed())
                     ->action(function (Order $record) {
-                        // Increase product stock
                         $product = Product::find($record->product_id);
                         if ($product) {
                             $product->increment('quantity', $record->quantity);
