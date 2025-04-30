@@ -16,7 +16,7 @@ Make sure to set database variables values correctly
 #### Run migrations and seeders
     ./vendor/bin/sail artisan migrate --seed
 #### Compile Frontend Assets
-    ./vendor/bin/sail npm install && sail npm run build
+    ./vendor/bin/sail npm install && ./vendor/bin/sail npm run build
 
 ## Filament Admin Access
 - URL : {your-host}/admin
