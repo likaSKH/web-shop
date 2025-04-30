@@ -110,18 +110,31 @@ class OrderResource extends Resource
             ])
             ->actions([
                 EditAction::make()
-                    ->visible(fn ($record) => $record->trashed() && auth()->user()->isAdmin()),
+                    ->visible(function ($record) {
+                        $user = auth()->user();
+                        return $user->isAdmin();
+                    }),
 
                 Action::make('cancel')
                     ->label('Cancel')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) => !$record->trashed())
+                    ->visible(function ($record) {
+                        $user = auth()->user();
+                        return !$record->trashed() && (
+                                $user->isAdmin() || $record->user_id === $user->id
+                            );
+                    })
                     ->action(function (Order $record) {
                         $product = Product::find($record->product_id);
                         if ($product) {
                             $product->increment('quantity', $record->quantity);
+                        }
+
+                        $user = $record->user;
+                        if ($user) {
+                            $user->increment('balance', $record->total);
                         }
 
                         $record->delete();

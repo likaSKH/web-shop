@@ -96,7 +96,7 @@
 
                         @if($product->quantity > 0)
                             <x-form-button @click.prevent="orderOpen = true" class="w-full">
-                                Add to Cart
+                                Order
                             </x-form-button>
                         @else
                             <span class="text-red-500">Out of stock</span>
