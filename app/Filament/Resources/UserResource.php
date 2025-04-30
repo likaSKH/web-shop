@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Models\Order;
 use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,7 +12,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Filters\SelectFilter;
 
 class UserResource extends Resource
 {
@@ -55,6 +53,8 @@ class UserResource extends Resource
                 Action::make('editBalance')
                     ->label('Edit Balance')
                     ->icon('heroicon-o-pencil')
+                    //ToDo adding to balance feature is for testing
+                    // purposes, since this feature would need additional steps in reeal app
                     ->form(fn (User $record) => [
                         TextInput::make('balance')
                             ->numeric()
