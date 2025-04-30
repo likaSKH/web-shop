@@ -39,7 +39,6 @@ class ProductResource extends Resource
                 TextInput::make('name')->required(),
                 TextInput::make('price')->numeric()->required(),
                 TextInput::make('quantity')->numeric()->minValue(0)->required(),
-
                 Select::make('categories')
                     ->multiple()
                     ->relationship('categories', 'name')
@@ -57,6 +56,11 @@ class ProductResource extends Resource
                 TextColumn::make('price')->label('Price'),
                 TextColumn::make('quantity')->label('Quantity'),
                 TextColumn::make('categories.name')->label('Categories'),
+                TextColumn::make('deleted_at')
+                    ->label('Status')
+                    ->formatStateUsing(fn ($record) => $record->deleted_at ? 'Inactive' : 'Active')
+                    ->badge()
+                    ->color(fn ($record) => $record->deleted_at ? 'danger' : 'success'),
             ])
             ->actions([
                 EditAction::make(),
