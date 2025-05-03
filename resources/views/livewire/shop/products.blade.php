@@ -95,15 +95,18 @@
                         </p>
 
                         @if($product->quantity > 0)
-                            <x-form-button @click.prevent="orderOpen = true" class="w-full">
-                                Order
+                            <x-form-button
+                                @click.prevent="orderOpen = true"
+                                class="w-full border border-teal-500 text-teal-600 bg-white hover:bg-teal-50 font-semibold py-2 px-4 rounded-md shadow-sm transition-colors duration-200"
+                            >
+                                Add To Cart
                             </x-form-button>
                         @else
                             <span class="text-red-500">Out of stock</span>
                         @endif
 
                         <template x-teleport="body">
-                            <x-order-modal :product="$product" :user="$user" />
+                            <x-add-to-cart-modal :product="$product" :user="$user" />
                         </template>
                     </div>
                 @endforeach
