@@ -33,4 +33,8 @@ class Product extends Model
         return $query->where('quantity', '>', 0);
     }
 
+    public function cartProducts()
+    {
+        return $this->hasMany(CartProduct::class);
+    }
 }
