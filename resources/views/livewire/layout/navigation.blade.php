@@ -36,6 +36,16 @@ new class extends Component
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
+                    <div class="relative flex items-center pr-8">
+                        <a href="{{ route('cart') }}" class="relative">
+                            <x-bi-cart-fill class="w-7 h-7 text-gray-700" />
+
+                            <span class="absolute -top-1/2  ml-4 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-teal-600 rounded-full">
+                                @livewire('shop.cart-count')
+                            </span>
+                        </a>
+                    </div>
+
                     <div class="flex items-center space-x-4">
                         <button wire:click="logout" class="text-gray-600 hover:text-gray-800 font-medium">
                             {{ __('Log Out') }}
@@ -71,7 +81,13 @@ new class extends Component
             </x-responsive-nav-link>
             @if(auth()->user()?->name)
                 <x-responsive-nav-link :href="route('profile')" :active="request()->routeIs('profile')" wire:navigate>
-                    {{ __('profile') }}
+                    {{ __('Profile') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('cart')" :active="request()->routeIs('profile')" wire:navigate>
+                    {{ __('Cart') }}
+                    <span class="py-1 px-1 text-xs font-bold text-white bg-teal-600 rounded-full">
+                        @livewire('shop.cart-count')
+                    </span>
                 </x-responsive-nav-link>
             @endif
         </div>

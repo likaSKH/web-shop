@@ -45,12 +45,6 @@
                 Your balance: ${{ number_format($user->balance, 2) }}
             </div>
 
-            <template x-if="total > userBalance">
-                <div class="text-red-500 text-sm">
-                    Insufficient balance
-                </div>
-            </template>
-
             <div class="flex space-x-2 pt-4">
                 <button
                     @click="orderOpen = false"
@@ -61,14 +55,14 @@
 
                 <button
                     @click.prevent="
-                        if (quantity > 0 && quantity <= available && total <= userBalance) {
-                            $wire.call('placeOrder', productId, quantity);
+                        if (quantity > 0 && quantity <= available) {
+                            $wire.call('addToCart', productId, quantity);
                             orderOpen = false;
                         }
                     "
                     class="flex-1 px-4 py-2 rounded-md bg-teal-600 hover:bg-teal-700 text-white"
-                    :disabled="quantity < 1 || quantity > available || total > userBalance"
-                >
+                    :disabled="quantity < 1 || quantity > available"
+                    >
                     Confirm
                 </button>
 

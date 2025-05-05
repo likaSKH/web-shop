@@ -1,5 +1,4 @@
 <div class="min-h-screen flex flex-col p-6 space-y-6 w-full max-w-5xl mx-auto">
-
     @if (session()->has('success'))
         <div
             x-data="{ show: true }"

@@ -25,6 +25,10 @@ class User extends Authenticatable
         'balance',
     ];
 
+    protected $casts = [
+        'balance' => 'decimal:2',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
