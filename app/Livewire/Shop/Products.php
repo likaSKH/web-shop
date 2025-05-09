@@ -44,45 +44,6 @@ class Products extends Component
         $this->resetPage();
     }
 
-//    public function placeOrder($productId, $quantity = 1)
-//    {
-//        if (!auth()->check()) {
-//            return redirect()->route('login');
-//        }
-//
-//        $product = Product::findOrFail($productId);
-//
-//        if ($quantity < 1 || $quantity > $product->quantity) {
-//            session()->flash('error', 'Product quantity is insufficient.');
-//            return;
-//        }
-//
-//        $total = $product->price * $quantity;
-//
-//        if ($total > auth()->user()->balance) {
-//            session()->flash('error', 'Insufficient balance');
-//            return;
-//        }
-//
-//        $user = auth()->user();
-//
-//        Order::create([
-//            'user_id' => $user->id,
-//            'user_name' => $user->name,
-//            'user_email' => $user->email,
-//            'product_id' => $productId,
-//            'quantity' => $quantity,
-//            'total' => $total,
-//        ]);
-//
-//        $product->decrement('quantity', $quantity);
-//
-//        auth()->user()->decrement('balance', $total);
-//
-//        session()->flash('success', 'Order was created successfully.');
-//        return redirect()->route('products');
-//    }
-
     public function addToCart($productId, $quantity = 1)
     {
         if (!auth()->check()) {

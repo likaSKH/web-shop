@@ -79,7 +79,7 @@
             <div class="pt-6 text-right">
                 <button
                     wire:click.prevent="openOrderModal"
-                    class="bg-blue-600 text-teal-900 font-semibold px-6 py-3 rounded-lg shadow-md border border-teal-700 hover:bg-teal-900 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    class="text-white bg-teal-600 font-semibold px-6 py-3 rounded-lg shadow-md border border-teal-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                 >
                     Order Now
                 </button>

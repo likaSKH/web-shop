@@ -130,17 +130,18 @@ class Cart extends Component
                 'user_email' => $user->email,
             ]);
 
-            foreach ($cart->cartProducts as $item) {
-                $order->products()->create([
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'total' => $item->price * $item->quantity,
-                ]);
+            foreach ($cart->cartProducts as $item) {$order->orderProducts()->create([
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+                'total' => $item->price * $item->quantity,
+            ]);
+
 
                 $item->product->decrement('quantity', $item->quantity);
             }
 
+            $user->decrement('balance', $total);
             $cart->cartProducts()->delete();
             $cart->update(['total' => 0]);
         });

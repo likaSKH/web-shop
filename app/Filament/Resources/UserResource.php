@@ -29,6 +29,11 @@ class UserResource extends Resource
             ->schema([
                 TextInput::make('name')->required(),
                 TextInput::make('email')->required()->email(),
+
+                TextInput::make('balance')
+                    ->numeric()
+                    ->default(0.00)
+                    ->required(),
             ]);
     }
 

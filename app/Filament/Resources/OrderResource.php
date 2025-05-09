@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Models\Product;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -30,34 +34,6 @@ class OrderResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Select::make('product_id')
-                ->label('Product')
-                ->relationship('product', 'name')
-                ->searchable()
-                ->preload()
-                ->required(),
-
-            TextInput::make('quantity')
-                ->numeric()
-                ->minValue(1)
-                ->maxValue(function (callable $get, ?Order $record) {
-                    $product = Product::find($get('product_id'));
-                    $currentQuantity = $record?->product_id === $get('product_id') ? $record?->quantity : 0;
-
-                    return optional($product)->quantity + $currentQuantity;
-                })->default(0)
-                ->required()
-                ->reactive()
-                ->afterStateUpdated(fn ($state, callable $set, $get) =>
-                    $set('total', Product::find($get('product_id'))?->price * $state)
-                ),
-
-            TextInput::make('total')
-                ->numeric()
-                ->disabled()
-                ->dehydrated()
-                ->required(),
-
             Select::make('user_id')
                 ->label('Customer')
                 ->relationship(
@@ -69,7 +45,7 @@ class OrderResource extends Resource
                 ->preload()
                 ->required()
                 ->reactive()
-                ->afterStateUpdated(function ($state, callable $set) {
+                ->afterStateUpdated(function ($state, Set $set) {
                     $user = \App\Models\User::find($state);
                     if ($user) {
                         $set('user_name', $user->name);
@@ -86,6 +62,75 @@ class OrderResource extends Resource
                 ->label('Customer Email')
                 ->disabled()
                 ->dehydrated(),
+
+            TextInput::make('total')
+                ->label('Total')
+                ->disabled()
+                ->dehydrated(),
+
+            Repeater::make('orderProducts')
+                ->relationship()
+                ->label('Products')
+                ->schema([
+                    Select::make('product_id')
+                        ->label('Product')
+                        ->options(fn () => Product::where('quantity', '>', 0)->pluck('name', 'id')->toArray())
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                            $product = Product::find($state);
+                            if ($product) {
+                                $quantity = $get('quantity') ?? 1;
+                                $set('price', $product->price);
+                                $set('total', $product->price * $quantity);
+                                $set('max_quantity', $product->quantity);
+                            }
+                        }),
+
+                    TextInput::make('quantity')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(function (Set $set, Get $get, $state) {
+                            $price = $get('price') ?? 0;
+                            $set('total', $state * $price);
+                        })
+                        ->maxValue(fn (Get $get) => $get('max_quantity')),
+
+                    TextInput::make('max_quantity')
+                        ->hidden()
+                        ->dehydrated(false),
+
+                    TextInput::make('price')
+                        ->numeric()
+                        ->disabled()
+                        ->required()
+                        ->dehydrated(true),
+
+                    TextInput::make('total')
+                        ->numeric()
+                        ->disabled()
+                        ->required()
+                        ->dehydrated(true),
+                ])
+                ->defaultItems(1)
+                ->minItems(1)
+                ->columns(2)
+                ->dehydrated(true)
+                ->afterStateHydrated(function (Get $get, Set $set) {
+                    $orderProducts = $get('orderProducts') ?? [];
+                    foreach ($orderProducts as $key => $orderProduct) {
+                        $product = Product::find($orderProduct['product_id']);
+                        if ($product) {
+                            $set("orderProducts.{$key}.price", $product->price);
+                            $set("orderProducts.{$key}.total", $product->price * $orderProduct['quantity']);
+                        }
+                    }
+                })
+                ->statePath('orderProducts')
         ]);
     }
 
@@ -93,12 +138,24 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')->label('Order ID'),
                 TextColumn::make('user.name')->label('Customer'),
-                TextColumn::make('product.name'),
-                TextColumn::make('quantity'),
-                TextColumn::make('total')->money('usd'),
                 TextColumn::make('user.email'),
+                TextColumn::make('total')->money('usd'),
+                TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {
+                    'pending' => 'warning',
+                    'canceled' => 'danger',
+                    'completed' => 'success',
+                    default => 'gray',
+                }),
                 TextColumn::make('created_at')->dateTime(),
+
+                TextColumn::make('orderProducts')
+                    ->label('Products')
+                    ->getStateUsing(fn ($record) => $record->orderProducts
+                        ->map(fn ($item) => "{$item->product->name} × {$item->quantity}")
+                        ->implode(', ')
+                    )->wrap(),
             ])
             ->filters([
                 Filter::make('Canceled')
@@ -110,10 +167,9 @@ class OrderResource extends Resource
             ])
             ->actions([
                 EditAction::make()
-                    ->visible(function ($record) {
-                        $user = auth()->user();
-                        return $user->isAdmin();
-                    }),
+                    ->label('Show')
+                    ->icon('heroicon-o-eye')
+                    ->visible(fn ($record) => auth()->user()->isAdmin()),
 
                 Action::make('cancel')
                     ->label('Cancel')
@@ -122,22 +178,36 @@ class OrderResource extends Resource
                     ->requiresConfirmation()
                     ->visible(function ($record) {
                         $user = auth()->user();
-                        return !$record->trashed() && (
-                                $user->isAdmin() || $record->user_id === $user->id
-                            );
+
+                        return !$record->trashed() && $record->status === OrderStatus::Pending->value && (
+                            $user->isAdmin() || $record->user_id === $user->id
+                        );
                     })
                     ->action(function (Order $record) {
-                        $product = Product::find($record->product_id);
-                        if ($product) {
-                            $product->increment('quantity', $record->quantity);
+                        foreach ($record->orderProducts as $item) {
+                            $item->product?->increment('quantity', $item->quantity);
                         }
 
-                        $user = $record->user;
-                        if ($user) {
-                            $user->increment('balance', $record->total);
-                        }
+                        $record->user?->increment('balance', $record->orderProducts->sum(
+                            fn ($item) => $item->price * $item->quantity
+                        ));
+
+                        $record->update(['status' => OrderStatus::Canceled->value]);
 
                         $record->delete();
+                    }),
+                Action::make('complete')
+                    ->label('Complete')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(function (Order $record) {
+                        return auth()->user()->isAdmin() &&
+                            !$record->trashed() &&
+                            $record->status === OrderStatus::Pending->value;
+                    })
+                    ->action(function (Order $record) {
+                        $record->update(['status' => OrderStatus::Completed->value]);
                     }),
             ]);
     }
