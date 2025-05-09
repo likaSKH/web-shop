@@ -34,8 +34,8 @@ Make sure to set database variables values correctly
    - Listing of orders
      - With ability to filter Canceled Orders
      - Cancel Order
-   - Create new Order
-   - Edit existing Order
+   - Create new Order with multiple products
+   - View existing Order
  - Products
    - List of Products
    - Create new Product
@@ -45,11 +45,6 @@ Make sure to set database variables values correctly
    - Edit Balance 
    - View customers orders
    - Create new customer
-### Admin Panel - Customer
-- Orders
-- Listing of orders
-    - With ability to filter Canceled Orders
-    - Cancel Order
 ### WebShop Front
 - Listing of Products
 - Ability to filter products by categories
@@ -60,12 +55,30 @@ Make sure to set database variables values correctly
   - Price Ascending
   - Price Descending
 - Pagination for products
-- If product quantity is available Order button appears
-  - On order modal 
-    - You choose quantity of product to buy
+- If product quantity is available Add To Cart button appears
+  - On Add To Cart modal 
+    - You choose quantity of product to add to cart
     - You can see total price and available balance on account
     - Cancel - cancels action
-    - Confirm - Will place an order
+    - Confirm - Will add item(s) to users cart
+- Cart - User can:
+  - Remove product from cart
+    - Outputs confirmation modal
+  - Change quantity
+  - See their balance
+  - See Total price of order as well as total price calculated by each item
+  - See Order button
+    - Outputs order confirmation
+      - Cancel - cancels an action
+      - Confirmation - places an order, which user can see in their Orders page
+- Orders - on this page user can:
+  - See list of placed orders with:
+    - Status
+    - Date
+    - Order number
+    - Products list
+    - Total and individual price by product
+  - Cancel order if status is still pending - this action requires approval
 - Notifications are available for successfully and unsuccessfully actions, with description texts
 - Users can navigate to Profile where they can see their balance and additional information
 - Orders link is available in navigation which will link to Filament dashboard Orders list
